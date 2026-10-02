@@ -1,0 +1,845 @@
+// Shared Tournament Data for 4th Annual Orange County Classic Varsity Tournament
+// Hosted by Troy High School Boys' Water Polo (Oct 2 - Oct 3, 2026)
+// Last Updated from Spreadsheet: 10/1/2026
+
+const SHEET_ID = "1F2dpycJ2gtmKaaaZBEy0bjKU9pJ7x-6VGOVJ8uCkKiw";
+const GVIZ_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:json";
+
+const POOLS = [
+  {
+    id: "bp",
+    name: "Buena Park High School",
+    short: "Buena Park",
+    address: "8833 Academy Dr, Buena Park, CA 90621",
+    map: "https://www.google.com/maps/place/Buena+Park+High+School/@33.8627472,-117.9806814,782m/data=!3m2!1e3!4b1!4m5!3m4!1s0x80dd2bcece88c7bf:0x5ff63842c03f2897!8m2!3d33.8627472!4d-117.9784927",
+    city: "Buena Park, CA",
+    notes: "Site for Bracket A, Bracket E, Saturday CC and FF placements"
+  },
+  {
+    id: "lh",
+    name: "La Habra High School",
+    short: "La Habra",
+    address: "801 Highlander Ave, La Habra, CA 90631",
+    map: "https://www.google.com/maps/place/La+Habra+High+School/@33.9362943,-117.9592645,743m/data=!3m2!1e3!4b1!4m5!3m4!1s0x80c2d533b364a851:0x3d371a0ea435f807!8m2!3d33.9362899!4d-117.9570758",
+    city: "La Habra, CA",
+    notes: "Site for Bracket B, Platinum Championship (1st & 3rd) & 5th-8th placement"
+  },
+  {
+    id: "sv",
+    name: "Servite High School",
+    short: "Servite",
+    address: "1952 W La Palma Ave, Anaheim, CA 92801",
+    map: "https://www.google.com/maps/place/Servite+High+School/@33.8457608,-117.9494694,755m/data=!3m2!1e3!4b1!4m6!3m5!1s0x80dd298d27168065:0xc90f64c29c1b811e!8m2!3d33.8457608!4d-117.9494694!16zL20vMDlqNm1x?entry=ttu&g_ep=EgoyMDI2MDgxOS4wIKXMDSoASAFQAw%3D%3D",
+    city: "Anaheim, CA",
+    notes: "Site for Bracket C qualifying rounds on Friday"
+  },
+  {
+    id: "tr",
+    name: "Troy High School",
+    short: "Troy",
+    address: "2200 Dorothy Ln, Fullerton, CA 92831",
+    map: "https://goo.gl/QKwpXt",
+    city: "Fullerton, CA",
+    notes: "Tournament Host Site, Bracket D, Bracket F, Gold Championship (1st & 3rd) & Saturday DD"
+  }
+];
+
+const RULES = [
+  { title: "Game Format", desc: "All teams play 2 games on Friday and 2 games on Saturday (4 games guaranteed)." },
+  { title: "Timing & Quarters", desc: "7-minute quarters with 2-minute breaks between quarters and halftime." },
+  { title: "Timeouts", desc: "3 Timeouts per regulation game (2 one-minute; 1 thirty-second)." },
+  { title: "Cap Color Rule", desc: "1st team listed wears DARK cap. 2nd team listed wears WHITE cap." },
+  { title: "Overtime", desc: "Sudden Victory Overtime. Timeouts DO NOT carry over into overtime — each team is allowed one 1-minute timeout in overtime." },
+  { title: "Running Clock Rule", desc: "Game scores of 8+ goal lead: game clock converts to running time after goals only." },
+  { title: "Tie Breakers (3-Team Brackets)", desc: "1. Goal Differential, 2. Head-to-Head result, 3. Least goals allowed." }
+];
+
+function slugify(text) {
+  return text.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+const TEAMS = [
+  { id: "san-marino", name: "San Marino", seed: "A1", group: "Bracket A", div: "Platinum", mascot: "Titans", colors: "Navy & White", city: "San Marino, CA", homePool: "Buena Park High School" },
+  { id: "canyon-crest", name: "Canyon Crest", seed: "A2", group: "Bracket A", div: "Platinum", mascot: "Ravens", colors: "Black, Cardinal & Gold", city: "San Diego, CA", homePool: "Buena Park High School" },
+  { id: "northwood", name: "Northwood", seed: "A3", group: "Bracket A", div: "Platinum", mascot: "Timberwolves", colors: "Navy & Carolina Blue", city: "Irvine, CA", homePool: "Buena Park High School" },
+  { id: "oceanside", name: "Oceanside", seed: "B1", group: "Bracket B", div: "Platinum", mascot: "Pirates", colors: "Green & White", city: "Oceanside, CA", homePool: "La Habra High School" },
+  { id: "la-habra", name: "La Habra", seed: "B2", group: "Bracket B", div: "Platinum", mascot: "Highlanders", colors: "Navy & Gold", city: "La Habra, CA", homePool: "La Habra High School" },
+  { id: "classical-academy", name: "Classical Academy", seed: "B3", group: "Bracket B", div: "Platinum", mascot: "Caimans", colors: "Crimson & Silver", city: "Escondido, CA", homePool: "La Habra High School" },
+  { id: "redlands", name: "Redlands", seed: "B4", group: "Bracket B", div: "Platinum", mascot: "Terriers", colors: "Navy & White", city: "Redlands, CA", homePool: "La Habra High School" },
+  { id: "servite", name: "Servite", seed: "C1", group: "Bracket C", div: "Platinum", mascot: "Friars", colors: "Black & White", city: "Anaheim, CA", homePool: "Servite High School" },
+  { id: "rancho-bernardo", name: "Rancho Bernardo", seed: "C2", group: "Bracket C", div: "Platinum", mascot: "Broncos", colors: "Royal Blue, Silver & White", city: "San Diego, CA", homePool: "Servite High School" },
+  { id: "flintridge-prep", name: "Flintridge Prep", seed: "C3", group: "Bracket C", div: "Platinum", mascot: "Wolves", colors: "Blue & Gray", city: "La Cañada, CA", homePool: "Servite High School" },
+  { id: "point-loma", name: "Point Loma", seed: "C4", group: "Bracket C", div: "Platinum", mascot: "Pointers", colors: "Maroon & Gold", city: "San Diego, CA", homePool: "Servite High School" },
+  { id: "downey", name: "Downey", seed: "D1", group: "Bracket D", div: "Platinum", mascot: "Vikings", colors: "Navy & Gold", city: "Downey, CA", homePool: "Troy High School" },
+  { id: "mt-carmel", name: "Mt. Carmel", seed: "D2", group: "Bracket D", div: "Platinum", mascot: "Sundevils", colors: "Red & Gold", city: "San Diego, CA", homePool: "Troy High School" },
+  { id: "chino-hills", name: "Chino Hills", seed: "D3", group: "Bracket D", div: "Platinum", mascot: "Huskies", colors: "Forest Green, Navy & Silver", city: "Chino Hills, CA", homePool: "Troy High School" },
+  { id: "del-norte", name: "Del Norte", seed: "E1", group: "Bracket E", div: "Gold", mascot: "Nighthawks", colors: "Navy, Teal & White", city: "San Diego, CA", homePool: "Buena Park High School" },
+  { id: "buena-park", name: "Buena Park", seed: "E2", group: "Bracket E", div: "Gold", mascot: "Coyotes", colors: "Forest Green & Gold", city: "Buena Park, CA", homePool: "Buena Park High School" },
+  { id: "san-dimas", name: "San Dimas", seed: "E3", group: "Bracket E", div: "Gold", mascot: "Saints", colors: "Royal Blue & Gold", city: "San Dimas, CA", homePool: "Buena Park High School" },
+  { id: "covina", name: "Covina", seed: "E4", group: "Bracket E", div: "Gold", mascot: "Colts", colors: "Kelly Green & White", city: "Covina, CA", homePool: "Buena Park High School" },
+  { id: "troy", name: "Troy", seed: "F1", group: "Bracket F", div: "Gold", mascot: "Warriors", colors: "Black, Red & Silver", city: "Fullerton, CA", homePool: "Troy High School" },
+  { id: "don-lugo", name: "Don Lugo", seed: "F2", group: "Bracket F", div: "Gold", mascot: "Conquistadores", colors: "Brown & Gold", city: "Chino, CA", homePool: "Troy High School" },
+  { id: "corona", name: "Corona", seed: "F3", group: "Bracket F", div: "Gold", mascot: "Panthers", colors: "Red & Gold", city: "Corona, CA", homePool: "Troy High School" },
+  { id: "la-mirada", name: "La Mirada", seed: "F4", group: "Bracket F", div: "Gold", mascot: "Matadores", colors: "Royal Blue & Gold", city: "La Mirada, CA", homePool: "Troy High School" }
+];
+
+// Helper to convert time strings for sorting
+function timeToMinutes(day, timeStr) {
+  const isSat = day.includes("Saturday");
+  const dayOffset = isSat ? 1440 : 0;
+  const parts = timeStr.trim().split(" ");
+  const [hoursStr, minsStr] = parts[0].split(":");
+  let hours = parseInt(hoursStr, 10);
+  const mins = parseInt(minsStr, 10);
+  const isPM = parts[1] === "PM";
+  if (isPM && hours < 12) hours += 12;
+  if (!isPM && hours === 12) hours = 0;
+  return dayOffset + (hours * 60) + mins;
+}
+
+// Full game schedule with updated times matching the latest 10/1/2026 spreadsheet
+const GAMES = [
+  // Friday Buena Park
+  {
+    id: "g-fri-bp-1",
+    day: "Friday, Oct 2",
+    time: "2:00 PM",
+    pool: "Buena Park",
+    div: "Gold",
+    game_num: "Gold Game #1",
+    stage: "Bracket E Semifinal 1",
+    dark: "Buena Park",
+    dark_code: "E2",
+    white: "San Dimas",
+    white_code: "E3",
+    advancement: "Winner to Game #3, Loser to Game #4",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-fri-bp-2",
+    day: "Friday, Oct 2",
+    time: "3:00 PM",
+    pool: "Buena Park",
+    div: "Gold",
+    game_num: "Gold Game #2",
+    stage: "Bracket E Semifinal 2",
+    dark: "Del Norte",
+    dark_code: "E1",
+    white: "Covina",
+    white_code: "E4",
+    advancement: "Winner to Game #3, Loser to Game #4",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-fri-bp-3",
+    day: "Friday, Oct 2",
+    time: "4:00 PM",
+    pool: "Buena Park",
+    div: "Platinum",
+    game_num: "Platinum Game #1",
+    stage: "Bracket A Round Robin (Match 1)",
+    dark: "Canyon Crest",
+    dark_code: "A2",
+    white: "Northwood",
+    white_code: "A3",
+    advancement: "Round-robin match determining Bracket A standings",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-fri-bp-4",
+    day: "Friday, Oct 2",
+    time: "5:00 PM",
+    pool: "Buena Park",
+    div: "Gold",
+    game_num: "Gold Game #3",
+    stage: "Bracket E 1st/2nd Final",
+    dark: "Winner Game #1",
+    dark_code: "W1",
+    white: "Winner Game #2",
+    white_code: "W2",
+    advancement: "Winner = 1st E (EE1), Loser = 2nd E (EE3)",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-fri-bp-5",
+    day: "Friday, Oct 2",
+    time: "6:00 PM",
+    pool: "Buena Park",
+    div: "Platinum",
+    game_num: "Platinum Game #2",
+    stage: "Bracket A Round Robin (Match 2)",
+    dark: "San Marino",
+    dark_code: "A1",
+    white: "Northwood",
+    white_code: "A3",
+    advancement: "Round-robin match determining Bracket A standings",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-fri-bp-6",
+    day: "Friday, Oct 2",
+    time: "7:00 PM",
+    pool: "Buena Park",
+    div: "Gold",
+    game_num: "Gold Game #4",
+    stage: "Bracket E 3rd/4th Final",
+    dark: "Loser Game #1",
+    dark_code: "L1",
+    white: "Loser Game #2",
+    white_code: "L2",
+    advancement: "Winner = 3rd E (FF1), Loser = 4th E (FF3)",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-fri-bp-7",
+    day: "Friday, Oct 2",
+    time: "8:00 PM",
+    pool: "Buena Park",
+    div: "Platinum",
+    game_num: "Platinum Game #3",
+    stage: "Bracket A Round Robin (Match 3)",
+    dark: "San Marino",
+    dark_code: "A1",
+    white: "Canyon Crest",
+    white_code: "A2",
+    advancement: "1st A to Bracket AA, 2nd A to BB, 3rd A to CC",
+    medal: false,
+    medal_type: null
+  },
+
+  // Friday La Habra (UPDATED: 5:00 PM, 6:00 PM, 7:30 PM, 8:30 PM)
+  {
+    id: "g-fri-lh-1",
+    day: "Friday, Oct 2",
+    time: "5:00 PM",
+    pool: "La Habra",
+    div: "Platinum",
+    game_num: "Platinum Game #4",
+    stage: "Bracket B Semifinal 1",
+    dark: "Oceanside",
+    dark_code: "B1",
+    white: "Redlands",
+    white_code: "B4",
+    advancement: "Winner to Game #7 (8:30 PM), Loser to Game #6 (7:30 PM)",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-fri-lh-2",
+    day: "Friday, Oct 2",
+    time: "6:00 PM",
+    pool: "La Habra",
+    div: "Platinum",
+    game_num: "Platinum Game #5",
+    stage: "Bracket B Semifinal 2",
+    dark: "La Habra",
+    dark_code: "B2",
+    white: "Classical Academy",
+    white_code: "B3",
+    advancement: "Winner to Game #7 (8:30 PM), Loser to Game #6 (7:30 PM)",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-fri-lh-3",
+    day: "Friday, Oct 2",
+    time: "7:30 PM",
+    pool: "La Habra",
+    div: "Platinum",
+    game_num: "Platinum Game #6",
+    stage: "Bracket B 3rd/4th Final",
+    dark: "Loser Game #4",
+    dark_code: "L4",
+    white: "Loser Game #5",
+    white_code: "L5",
+    advancement: "Winner = 3rd B (CC2), Loser = 4th B (DD3)",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-fri-lh-4",
+    day: "Friday, Oct 2",
+    time: "8:30 PM",
+    pool: "La Habra",
+    div: "Platinum",
+    game_num: "Platinum Game #7",
+    stage: "Bracket B 1st/2nd Final",
+    dark: "Winner Game #4",
+    dark_code: "W4",
+    white: "Winner Game #5",
+    white_code: "W5",
+    advancement: "Winner = 1st B (AA2), Loser = 2nd B (BB2)",
+    medal: false,
+    medal_type: null
+  },
+
+  // Friday Servite
+  {
+    id: "g-fri-sv-1",
+    day: "Friday, Oct 2",
+    time: "3:00 PM",
+    pool: "Servite",
+    div: "Platinum",
+    game_num: "Platinum Game #8",
+    stage: "Bracket C Semifinal 1",
+    dark: "Servite",
+    dark_code: "C1",
+    white: "Point Loma",
+    white_code: "C4",
+    advancement: "Winner to Game #11, Loser to Game #10",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-fri-sv-2",
+    day: "Friday, Oct 2",
+    time: "4:00 PM",
+    pool: "Servite",
+    div: "Platinum",
+    game_num: "Platinum Game #9",
+    stage: "Bracket C Semifinal 2",
+    dark: "Rancho Bernardo",
+    dark_code: "C2",
+    white: "Flintridge Prep",
+    white_code: "C3",
+    advancement: "Winner to Game #11, Loser to Game #10",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-fri-sv-3",
+    day: "Friday, Oct 2",
+    time: "6:00 PM",
+    pool: "Servite",
+    div: "Platinum",
+    game_num: "Platinum Game #10",
+    stage: "Bracket C 3rd/4th Final",
+    dark: "Loser Game #8",
+    dark_code: "L8",
+    white: "Loser Game #9",
+    white_code: "L9",
+    advancement: "Winner = 3rd C (DD1), Loser = 4th C (CC3)",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-fri-sv-4",
+    day: "Friday, Oct 2",
+    time: "7:00 PM",
+    pool: "Servite",
+    div: "Platinum",
+    game_num: "Platinum Game #11",
+    stage: "Bracket C 1st/2nd Final",
+    dark: "Winner Game #8",
+    dark_code: "W8",
+    white: "Winner Game #9",
+    white_code: "W9",
+    advancement: "Winner = 1st C (AA3), Loser = 2nd C (BB3)",
+    medal: false,
+    medal_type: null
+  },
+
+  // Friday Troy
+  {
+    id: "g-fri-tr-1",
+    day: "Friday, Oct 2",
+    time: "2:00 PM",
+    pool: "Troy",
+    div: "Gold",
+    game_num: "Gold Game #5",
+    stage: "Bracket F Semifinal 1",
+    dark: "Don Lugo",
+    dark_code: "F2",
+    white: "Corona",
+    white_code: "F3",
+    advancement: "Winner to Game #7, Loser to Game #8",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-fri-tr-2",
+    day: "Friday, Oct 2",
+    time: "3:00 PM",
+    pool: "Troy",
+    div: "Gold",
+    game_num: "Gold Game #6",
+    stage: "Bracket F Semifinal 2",
+    dark: "Troy",
+    dark_code: "F1",
+    white: "La Mirada",
+    white_code: "F4",
+    advancement: "Winner to Game #7, Loser to Game #8",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-fri-tr-3",
+    day: "Friday, Oct 2",
+    time: "4:00 PM",
+    pool: "Troy",
+    div: "Platinum",
+    game_num: "Platinum Game #12",
+    stage: "Bracket D Round Robin (Match 1)",
+    dark: "Mt. Carmel",
+    dark_code: "D2",
+    white: "Chino Hills",
+    white_code: "D3",
+    advancement: "Round-robin match determining Bracket D standings",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-fri-tr-4",
+    day: "Friday, Oct 2",
+    time: "5:00 PM",
+    pool: "Troy",
+    div: "Gold",
+    game_num: "Gold Game #7",
+    stage: "Bracket F 1st/2nd Final",
+    dark: "Winner Game #5",
+    dark_code: "W5",
+    white: "Winner Game #6",
+    white_code: "W6",
+    advancement: "Winner = 1st F (EE2), Loser = 2nd F (EE4)",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-fri-tr-5",
+    day: "Friday, Oct 2",
+    time: "6:00 PM",
+    pool: "Troy",
+    div: "Platinum",
+    game_num: "Platinum Game #13",
+    stage: "Bracket D Round Robin (Match 2)",
+    dark: "Downey",
+    dark_code: "D1",
+    white: "Chino Hills",
+    white_code: "D3",
+    advancement: "Round-robin match determining Bracket D standings",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-fri-tr-6",
+    day: "Friday, Oct 2",
+    time: "7:00 PM",
+    pool: "Troy",
+    div: "Gold",
+    game_num: "Gold Game #8",
+    stage: "Bracket F 3rd/4th Final",
+    dark: "Loser Game #5",
+    dark_code: "L5",
+    white: "Loser Game #6",
+    white_code: "L6",
+    advancement: "Winner = 3rd F (FF2), Loser = 4th F (FF4)",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-fri-tr-7",
+    day: "Friday, Oct 2",
+    time: "8:00 PM",
+    pool: "Troy",
+    div: "Platinum",
+    game_num: "Platinum Game #14",
+    stage: "Bracket D Round Robin (Match 3)",
+    dark: "Downey",
+    dark_code: "D1",
+    white: "Mt. Carmel",
+    white_code: "D2",
+    advancement: "1st D to Bracket AA, 2nd D to BB, 3rd D to DD",
+    medal: false,
+    medal_type: null
+  },
+
+  // Saturday La Habra (UPDATED: 7:00 AM - 2:00 PM)
+  {
+    id: "g-sat-lh-1",
+    day: "Saturday, Oct 3",
+    time: "7:00 AM",
+    pool: "La Habra",
+    div: "Platinum",
+    game_num: "Platinum Game #15",
+    stage: "Bracket BB Semifinal 1 (5th–8th Place)",
+    dark: "BB2 (2nd B)",
+    dark_code: "BB2",
+    white: "BB3 (2nd C)",
+    white_code: "BB3",
+    advancement: "Winner to Game #19 (11:00 AM), Loser to Game #20 (12:00 PM)",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-sat-lh-2",
+    day: "Saturday, Oct 3",
+    time: "8:00 AM",
+    pool: "La Habra",
+    div: "Platinum",
+    game_num: "Platinum Game #16",
+    stage: "Bracket BB Semifinal 2 (5th–8th Place)",
+    dark: "BB1 (2nd A)",
+    dark_code: "BB1",
+    white: "BB4 (2nd D)",
+    white_code: "BB4",
+    advancement: "Winner to Game #19 (11:00 AM), Loser to Game #20 (12:00 PM)",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-sat-lh-3",
+    day: "Saturday, Oct 3",
+    time: "9:00 AM",
+    pool: "La Habra",
+    div: "Platinum",
+    game_num: "Platinum Game #17",
+    stage: "Bracket AA Semifinal 1 (Championship Semi)",
+    dark: "AA2 (1st B)",
+    dark_code: "AA2",
+    white: "AA3 (1st C)",
+    white_code: "AA3",
+    advancement: "Winner to Platinum Championship (1:00 PM), Loser to 3rd Place (2:00 PM)",
+    medal: true,
+    medal_type: "semifinal",
+    medal_label: "Platinum Championship Semifinal"
+  },
+  {
+    id: "g-sat-lh-4",
+    day: "Saturday, Oct 3",
+    time: "10:00 AM",
+    pool: "La Habra",
+    div: "Platinum",
+    game_num: "Platinum Game #18",
+    stage: "Bracket AA Semifinal 2 (Championship Semi)",
+    dark: "AA1 (1st A)",
+    dark_code: "AA1",
+    white: "AA4 (1st D)",
+    white_code: "AA4",
+    advancement: "Winner to Platinum Championship (1:00 PM), Loser to 3rd Place (2:00 PM)",
+    medal: true,
+    medal_type: "semifinal",
+    medal_label: "Platinum Championship Semifinal"
+  },
+  {
+    id: "g-sat-lh-5",
+    day: "Saturday, Oct 3",
+    time: "11:00 AM",
+    pool: "La Habra",
+    div: "Platinum",
+    game_num: "Platinum Game #19",
+    stage: "Platinum 5th Place Game",
+    dark: "Winner Game #15",
+    dark_code: "W15",
+    white: "Winner Game #16",
+    white_code: "W16",
+    advancement: "Winner finishes 5th, Loser finishes 6th in Platinum Division",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-sat-lh-6",
+    day: "Saturday, Oct 3",
+    time: "12:00 PM",
+    pool: "La Habra",
+    div: "Platinum",
+    game_num: "Platinum Game #20",
+    stage: "Platinum 7th Place Game",
+    dark: "Loser Game #15",
+    dark_code: "L15",
+    white: "Loser Game #16",
+    white_code: "L16",
+    advancement: "Winner finishes 7th, Loser finishes 8th in Platinum Division",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-sat-lh-7",
+    day: "Saturday, Oct 3",
+    time: "1:00 PM",
+    pool: "La Habra",
+    div: "Platinum",
+    game_num: "Platinum Game #21",
+    stage: "Platinum 1st Place Championship (Gold / Silver Medal)",
+    dark: "Winner Game #17",
+    dark_code: "W17",
+    white: "Winner Game #18",
+    white_code: "W18",
+    advancement: "1st Place Champion & 2nd Place Runner-Up Medals Awarded",
+    medal: true,
+    medal_type: "gold",
+    medal_label: "🥇 Platinum 1st Place Championship (Gold/Silver Medal)"
+  },
+  {
+    id: "g-sat-lh-8",
+    day: "Saturday, Oct 3",
+    time: "2:00 PM",
+    pool: "La Habra",
+    div: "Platinum",
+    game_num: "Platinum Game #22",
+    stage: "Platinum 3rd Place Game (Bronze Medal)",
+    dark: "Loser Game #17",
+    dark_code: "L17",
+    white: "Loser Game #18",
+    white_code: "L18",
+    advancement: "3rd Place Bronze Medal Awarded to Winner",
+    medal: true,
+    medal_type: "bronze",
+    medal_label: "🥉 Platinum 3rd Place Game (Bronze Medal Match)"
+  },
+
+  // Saturday Buena Park (UPDATED: 7:00 AM - 1:00 PM)
+  {
+    id: "g-sat-bp-1",
+    day: "Saturday, Oct 3",
+    time: "7:00 AM",
+    pool: "Buena Park",
+    div: "Gold",
+    game_num: "Gold Game #9 (Consolation)",
+    stage: "Bracket FF Semifinal 1 (5th–8th Place)",
+    dark: "FF1 (3rd E)",
+    dark_code: "FF1",
+    white: "FF4 (4th F)",
+    white_code: "FF4",
+    advancement: "Winner to 5th Place Game (10:00 AM), Loser to 7th Place Game (12:00 PM)",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-sat-bp-2",
+    day: "Saturday, Oct 3",
+    time: "8:00 AM",
+    pool: "Buena Park",
+    div: "Gold",
+    game_num: "Gold Game #10 (Consolation)",
+    stage: "Bracket FF Semifinal 2 (5th–8th Place)",
+    dark: "FF2 (3rd F)",
+    dark_code: "FF2",
+    white: "FF3 (4th E)",
+    white_code: "FF3",
+    advancement: "Winner to 5th Place Game (10:00 AM), Loser to 7th Place Game (12:00 PM)",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-sat-bp-3",
+    day: "Saturday, Oct 3",
+    time: "9:00 AM",
+    pool: "Buena Park",
+    div: "Platinum",
+    game_num: "Platinum Game #23",
+    stage: "Bracket CC Round Robin (Match 1)",
+    dark: "CC2 (3rd B)",
+    dark_code: "CC2",
+    white: "CC3 (4th C)",
+    white_code: "CC3",
+    advancement: "Consolation round robin (3rd A, 3rd B, 4th C)",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-sat-bp-4",
+    day: "Saturday, Oct 3",
+    time: "10:00 AM",
+    pool: "Buena Park",
+    div: "Gold",
+    game_num: "Gold Game #11 (Consolation)",
+    stage: "Gold 5th Place Game",
+    dark: "Winner Semifinal 1",
+    dark_code: "FF1",
+    white: "Winner Semifinal 2",
+    white_code: "FF2",
+    advancement: "Winner finishes 5th, Loser finishes 6th in Gold Division",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-sat-bp-5",
+    day: "Saturday, Oct 3",
+    time: "11:00 AM",
+    pool: "Buena Park",
+    div: "Platinum",
+    game_num: "Platinum Game #24",
+    stage: "Bracket CC Round Robin (Match 2)",
+    dark: "CC1 (3rd A)",
+    dark_code: "CC1",
+    white: "CC3 (4th C)",
+    white_code: "CC3",
+    advancement: "Consolation round robin (3rd A, 3rd B, 4th C)",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-sat-bp-6",
+    day: "Saturday, Oct 3",
+    time: "12:00 PM",
+    pool: "Buena Park",
+    div: "Gold",
+    game_num: "Gold Game #12 (Consolation)",
+    stage: "Gold 7th Place Game",
+    dark: "Loser Semifinal 1",
+    dark_code: "FF3",
+    white: "Loser Semifinal 2",
+    white_code: "FF4",
+    advancement: "Winner finishes 7th, Loser finishes 8th in Gold Division",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-sat-bp-7",
+    day: "Saturday, Oct 3",
+    time: "1:00 PM",
+    pool: "Buena Park",
+    div: "Platinum",
+    game_num: "Platinum Game #25",
+    stage: "Bracket CC Round Robin (Match 3)",
+    dark: "CC1 (3rd A)",
+    dark_code: "CC1",
+    white: "CC2 (3rd B)",
+    white_code: "CC2",
+    advancement: "Finalizes Platinum 9th–11th Place",
+    medal: false,
+    medal_type: null
+  },
+
+  // Saturday Troy (UPDATED: 7:00 AM - 1:00 PM)
+  {
+    id: "g-sat-tr-1",
+    day: "Saturday, Oct 3",
+    time: "7:00 AM",
+    pool: "Troy",
+    div: "Gold",
+    game_num: "Gold Game #9 (EE Semi)",
+    stage: "Bracket EE Semifinal 1 (Championship Semi)",
+    dark: "EE1 (1st E)",
+    dark_code: "EE1",
+    white: "EE4 (2nd F)",
+    white_code: "EE4",
+    advancement: "Winner to Gold Championship (10:00 AM), Loser to 3rd Place (12:00 PM)",
+    medal: true,
+    medal_type: "semifinal",
+    medal_label: "Gold Championship Semifinal"
+  },
+  {
+    id: "g-sat-tr-2",
+    day: "Saturday, Oct 3",
+    time: "8:00 AM",
+    pool: "Troy",
+    div: "Gold",
+    game_num: "Gold Game #10 (EE Semi)",
+    stage: "Bracket EE Semifinal 2 (Championship Semi)",
+    dark: "EE2 (1st F)",
+    dark_code: "EE2",
+    white: "EE3 (2nd E)",
+    white_code: "EE3",
+    advancement: "Winner to Gold Championship (10:00 AM), Loser to 3rd Place (12:00 PM)",
+    medal: true,
+    medal_type: "semifinal",
+    medal_label: "Gold Championship Semifinal"
+  },
+  {
+    id: "g-sat-tr-3",
+    day: "Saturday, Oct 3",
+    time: "9:00 AM",
+    pool: "Troy",
+    div: "Platinum",
+    game_num: "Platinum Game #26",
+    stage: "Bracket DD Round Robin (Match 1)",
+    dark: "DD2 (3rd D)",
+    dark_code: "DD2",
+    white: "DD3 (4th B)",
+    white_code: "DD3",
+    advancement: "Consolation round robin (3rd C, 3rd D, 4th B)",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-sat-tr-4",
+    day: "Saturday, Oct 3",
+    time: "10:00 AM",
+    pool: "Troy",
+    div: "Gold",
+    game_num: "Gold Game #11 (Championship)",
+    stage: "Gold 1st Place Championship (Gold / Silver Medal)",
+    dark: "Winner Game #9",
+    dark_code: "W9",
+    white: "Winner Game #10",
+    white_code: "W10",
+    advancement: "Gold Division Champion & Runner-Up Medals Awarded",
+    medal: true,
+    medal_type: "gold",
+    medal_label: "🥇 Gold 1st Place Championship (Gold/Silver Medal)"
+  },
+  {
+    id: "g-sat-tr-5",
+    day: "Saturday, Oct 3",
+    time: "11:00 AM",
+    pool: "Troy",
+    div: "Platinum",
+    game_num: "Platinum Game #27",
+    stage: "Bracket DD Round Robin (Match 2)",
+    dark: "DD1 (3rd C)",
+    dark_code: "DD1",
+    white: "DD3 (4th B)",
+    white_code: "DD3",
+    advancement: "Consolation round robin (3rd C, 3rd D, 4th B)",
+    medal: false,
+    medal_type: null
+  },
+  {
+    id: "g-sat-tr-6",
+    day: "Saturday, Oct 3",
+    time: "12:00 PM",
+    pool: "Troy",
+    div: "Gold",
+    game_num: "Gold Game #12 (3rd Place)",
+    stage: "Gold 3rd Place Game (Bronze Medal)",
+    dark: "Loser Game #9",
+    dark_code: "L9",
+    white: "Loser Game #10",
+    white_code: "L10",
+    advancement: "Winner finishes 3rd, Loser finishes 4th (Bronze Medal Match)",
+    medal: true,
+    medal_type: "bronze",
+    medal_label: "🥉 Gold 3rd Place Game (Bronze Medal Match)"
+  },
+  {
+    id: "g-sat-tr-7",
+    day: "Saturday, Oct 3",
+    time: "1:00 PM",
+    pool: "Troy",
+    div: "Platinum",
+    game_num: "Platinum Game #28",
+    stage: "Bracket DD Round Robin (Match 3)",
+    dark: "DD1 (3rd C)",
+    dark_code: "DD1",
+    white: "DD2 (3rd D)",
+    white_code: "DD2",
+    advancement: "Finalizes Platinum 12th–14th Place",
+    medal: false,
+    medal_type: null
+  }
+];
+
+// Helper to look up team by name or slug
+function findTeam(query) {
+  if (!query) return null;
+  const q = query.toLowerCase().trim();
+  return TEAMS.find(t => t.id === q || t.name.toLowerCase() === q || slugify(t.name) === q);
+}
+
+// Helper to get pool map URL
+function getPoolMap(shortName) {
+  const p = POOLS.find(item => item.short.toLowerCase() === shortName.toLowerCase() || item.name.toLowerCase().includes(shortName.toLowerCase()));
+  return p ? p.map : "#";
+}
+
+// Export for module/node environments, or attach to window for plain browsers
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { SHEET_ID, GVIZ_URL, POOLS, RULES, TEAMS, GAMES, slugify, findTeam, getPoolMap, timeToMinutes };
+}
